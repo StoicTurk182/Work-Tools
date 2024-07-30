@@ -1,0 +1,76 @@
+
+
+Method 1: WITHOUT a 3rd party program (I used this)
+Create a file called sudo.bat (you can replace sudo with any name you want) with following content 
+powershell.exe -Command "Start-Process cmd \"/k cd /d %cd%\" -Verb RunAs"
+Move sudo.bat to a folder in your PATH; if you don't know what that means, just move these files to c:\windows\
+Now sudo will work in Run dialog (win+r) or in explorer address bar (this is the best part :))
+
+Method 2: WITH a 3rd party program
+Download NirCmd and unzip it.
+Create a file called sudo.bat (you can replace sudo with any name you want) with following content 
+nircmdc elevate cmd /k "cd /d %cd%"
+Move nircmdc.exe and sudo.bat to a folder in your PATH; if you don't know what that means, just move these files to c:\windows\
+Now sudo will work in Run dialog (win+r) or in explorer address bar (this is the best part :))
+
+
+Steps to List and Add Capabilities
+List Available Capabilities
+
+To view all the capabilities that you can add to your system, you can use the following DISM command:
+
+shell
+Copy code
+DISM /Online /Get-Capabilities
+This command will provide a list of capabilities currently available for your system, including their full names and descriptions. The output will show detailed information about each capability.
+
+Filter and Select Capabilities
+
+If you want to see only a specific capability or filter the list, you can redirect the output to a file and then search through it. For example:
+
+shell
+Copy code
+DISM /Online /Get-Capabilities > capabilities.txt
+Open capabilities.txt in a text editor to review the list. Look for the capability you want to add.
+
+Add a Capability
+
+Once you've identified the capability you want to add from the list, you can use the following DISM command to add it:
+
+shell
+Copy code
+DISM /Online /Add-Capability /CapabilityName:<CapabilityName>
+Replace <CapabilityName> with the full name of the capability you want to add. For example:
+
+shell
+Copy code
+DISM /Online /Add-Capability /CapabilityName:Microsoft-Windows-Subsystem-Linux~~~~0.0.1.0
+Example Capabilities
+Here are some examples of common capabilities that you might add:
+
+Microsoft-Windows-Subsystem-Linux: Adds the Windows Subsystem for Linux.
+Microsoft-Windows-OpenSSH.Server~~~~0.0.1.0: Adds the OpenSSH Server feature.
+Microsoft-Windows-Remote-Desktop-Client-Package31bf3856ad364e35amd64~~.0.0.1.0: Adds the Remote Desktop Client.
+Example Commands
+List All Capabilities
+
+shell
+Copy code
+DISM /Online /Get-Capabilities
+Add a Specific Capability
+
+shell
+Copy code
+DISM /Online /Add-Capability /CapabilityName:Microsoft-Windows-Subsystem-Linux~~~~0.0.1.0
+Check the Status of Capabilities
+
+To check the status of capabilities already added or to verify if a specific capability is installed, use:
+
+shell
+Copy code
+DISM /Online /Get-CapabilityInfo /CapabilityName:<CapabilityName>
+Summary
+Query Available Capabilities: Use DISM /Online /Get-Capabilities to list all available capabilities.
+Choose Capability: Review the capabilities in the output.
+Add Capability: Use DISM /Online /Add-Capability /CapabilityName:<CapabilityName> to add the desired capability.
+By following these steps, you can effectively manage and add capabilities to your Windows installation using DISM.
