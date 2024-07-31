@@ -1,0 +1,45 @@
+Basic Commands
+@echo off: Turns off the display of commands in the script.
+echo [message]: Displays messages or turns command echoing on or off.
+cls: Clears the screen.
+pause: Pauses the execution of the script and displays a message prompting the user to press any key to continue.
+rem [comment]: Adds a comment line in the script.
+File and Directory Operations
+cd [path]: Changes the current directory.
+dir: Lists files and directories in the current directory.
+md [dirname] or mkdir [dirname]: Creates a new directory.
+rd [dirname] or rmdir [dirname]: Removes a directory.
+del [filename]: Deletes a file.
+copy [source] [destination]: Copies files from one location to another.
+move [source] [destination]: Moves files from one location to another.
+ren [oldname] [newname] or rename [oldname] [newname]: Renames a file or directory.
+Conditional Statements
+if [condition] [command]: Executes a command if the specified condition is true.
+if exist [filename] [command]: Executes a command if the specified file exists.
+if not exist [filename] [command]: Executes a command if the specified file does not exist.
+if defined [variable] [command]: Executes a command if the specified environment variable is defined.
+if /i [string1]==[string2] [command]: Compares two strings (case-insensitive) and executes a command if they are equal.
+Loops
+for %%variable in (set) do [command]: Loops through a set of values and executes a command for each value.
+for /l %%variable in (start,step,end) do [command]: Loops a specified number of times.
+for /f %%variable in (file) do [command]: Loops through the lines in a file and executes a command for each line.
+Variable Handling
+set [variable]=[value]: Sets the value of an environment variable.
+set /p [variable]=[prompt]: Prompts the user for input and assigns it to a variable.
+%variable%: Expands the value of a variable.
+Network Commands
+net user: Manages user accounts.
+net localgroup: Manages local groups.
+ping [address]: Tests connectivity to a network address.
+ipconfig: Displays IP configuration information.
+tracert [address]: Traces the route to a network address.
+System Information
+systeminfo: Displays detailed system configuration information.
+tasklist: Displays a list of currently running processes.
+taskkill /pid [process_id] /f: Kills a process by its ID.
+Flow Control
+goto [label]: Jumps to a specified label in the script.
+call [batchfile]: Calls another batch file and returns to the current script after execution.
+exit: Exits the script or command prompt.
+Labels
+:[label]: Defines a label in the script for use with goto.
