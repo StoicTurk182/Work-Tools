@@ -1,0 +1,70 @@
+
+\\Workaround run below.bat\\
+
+For optiplex F12 - Select Windows Boot Manager - F8 safemode "with networking". 
+
+Boot into Safe Mode from Windows 11 or Windows 10
+Press the Windows + I on the keyboard to open Settings.
+If that does not work, click Start and then select Settings.
+Click Update & Security, and on the left pane select Recovery.
+Under Advanced Startup, click Restart Now.
+After the computer restarts, on the Choose an Option screen, select Troubleshoot > Advanced Options > Startup Settings > Restart.
+After the computer restarts, a list of options appears. Select 4 or F4 to start the computer in Safe Mode. If you must use the Internet, select 5 or F5 for Safe Mode with Networking.
+
+Boot into Safe Mode from the sign-in screen in Windows 11 or Windows 10
+Restart the computer.
+At the sign-in screen, hold the Shift key down and then click Power > Restart.
+After the computer restarts to the Choose an Option screen, select Troubleshoot > Advanced Options > Startup Settings > Restart.
+After the computer restarts, a list of options should appear. Select 4 or F4 to start the computer in Safe Mode. If you must use the Internet, select 5 or F5 for Safe Mode with Networking.
+
+Boot into Safe Mode from outside of Windows 11 or Windows 10
+Windows 11 and Windows 10 automatically boot into the Windows Recovery Environment (WinRE) if Windows fails to start three times in a row. Three consecutive failed attempts trigger this action. Booting to Safe Mode outside of Windows is achieved in the WinRE.
+
+Follow these steps to enter Safe Mode from the WinRE:
+At the Choose an option screen, select Troubleshoot.
+At the Troubleshoot screen, select Advanced Options.
+At the Advanced Options screen, select Advanced Startup Options.
+Select Startup Settings.
+Select Restart.
+The computer restarts and enters the Startup Settings menu. Select 4 or F4 to start the computer in Safe Mode. If you must use the Internet, select 5 or F5 for Safe Mode with Networking.
+
+--------------------------------------------------------------------------------------------
+
+@echo off
+
+set filePath=C:\Windows\System32\drivers\CrowdStrike\C-00000291-00000000-00000033.sys
+
+if exist %filePath% (
+    del %filePath%
+    echo File deleted successfully.
+) else (
+    echo File does not exist.
+)
+
+pause 
+
+exit
+
+--------------------------------------------------------------------------------------------
+
+Also alternate:
+ 
+del C:\Windows\System32\drivers\CrowdStrike\C-00000291-00000000-00000033.sys
+
+--------------------------------------------------------------------------------------------
+\\Ongoing issues: 
+
+TLLON-OSCAR-30 (VEEM catalog & inventory of tapes) server was distrupted by the outage due to CloudStrike. (Resolved)
+
+
+\\Unrelated to CroudStrike 
+BackupExec catalog failure restating operation. (Running a sequencial inventory and catalog seemed to fixes this issue)
+--------------------------------------------------------------------------------------------
+\\DOA Check on GPU 4060 (needs to be done by 25/7/2024.)  
+
+
+\\Ongoing Killdisk Operation on marked drives. (Long term goal finsih before end of year)
+--------------------------------------------------------------------------------------------
+Notes: Another option is to use PXE and WindowPE, modifing the start.cmd with the  about .bat instructions will resolve the issue also you can use Psexec from systernals to make these changes.
+
+   
