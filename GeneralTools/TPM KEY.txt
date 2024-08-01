@@ -1,0 +1,22 @@
+manage-bde
+
+manage-bde -protectors -add C: -StartupKey D:
+
+\\Replace drive letters with relvenat drive letters you want the key to be active on.\\
+
+manage-bde -status
+
+\\Shows the status of bitlock and types of security that is active.\\
+
+Manage-bde – protectors -delete c: -type password
+
+Manage-bde -protectors -add c: -tpm
+
+\\Remove PIN
+manage-bde -protectors -get C:
+manage-bde -protectors -delete C: -type password
+manage-bde -protectors -delete C: -type TPMAndPIN
+manage-bde -protectors -delete C: -type NumericalPassword
+
+
+
