@@ -1,0 +1,12 @@
+# Define variables
+$computerName = "YOURPCNAME"
+$workgroupName = "WORKGROUP"
+
+# Prompt for domain user credentials
+$credential = Get-Credential -Message "Enter domain user credentials to unjoin the computer from the domain"
+
+# Remove the computer from the domain and add to the specified workgroup
+Remove-Computer -ComputerName $computerName -UnjoinDomaincredential $credential -WorkgroupName $workgroupName -Restart -Force
+
+
+#https://www.pdq.com/powershell/remove-computer/
