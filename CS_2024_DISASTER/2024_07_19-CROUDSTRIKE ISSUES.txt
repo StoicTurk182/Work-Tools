@@ -54,8 +54,7 @@ del C:\Windows\System32\drivers\CrowdStrike\C-00000291-00000000-00000033.sys
 --------------------------------------------------------------------------------------------
 \\Ongoing issues: 
 
-TLLON-OSCAR-30 (VEEM catalog & inventory of tapes) server was distrupted by the outage due to CloudStrike. (Resolved)
-
+(VEEM catalog & inventory of tapes) server was distrupted by the outage due to CloudStrike. (Resolved)
 
 \\Unrelated to CroudStrike 
 BackupExec catalog failure restating operation. (Running a sequencial inventory and catalog seemed to fixes this issue)
