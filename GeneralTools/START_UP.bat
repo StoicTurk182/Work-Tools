@@ -1,6 +1,7 @@
 @echo off
 setlocal enabledelayedexpansion
 
+:menu 
 :: List installed applications
 echo List of installed applications:
 set /a count=0
@@ -11,7 +12,6 @@ for /f "tokens=*" %%i in ('dir /b "C:\Program Files"') do (
     set "app[!count!]=%%i"
     echo !count!. %%i
 )
-
 :: User selection
 set /p choice=Please enter the number of the application to add to startup:
 
@@ -33,4 +33,12 @@ echo Creating shortcut for %selectedApp% in Startup folder...
 powershell.exe -Command "$s=(New-Object -COM WScript.Shell).CreateShortcut('%startupFolder%\%shortcutName%.lnk');$s.TargetPath='C:\Program Files\%selectedApp%\%selectedApp%.exe';$s.Save()"
 
 echo %selectedApp% has been added to startup.
+
+:: Loop back to the menu after the operation
+goto menu
+
+
+:end
+cls
+echo Goodbye!
 pause
