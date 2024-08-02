@@ -20,5 +20,8 @@ if /i "%action%"=="y" ping %hostname%
 set /p action=Do you want to run ipconfig? (y/n): 
 if /i "%action%"=="y" ipconfig
 
+set /p action=Do you want to exit? (y/n): 
+if /i "%action%"=="y" exit
+
 echo.
 goto loop
