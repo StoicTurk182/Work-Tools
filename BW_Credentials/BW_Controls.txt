@@ -1,0 +1,4 @@
+$bitwardenCLIPath list items --session $loginResult --search "keyword" --organizationid <org_id> --folderid <folder_id> --type <type>
+
+$bitwardenCLIPath --help
+
