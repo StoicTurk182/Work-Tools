@@ -44,6 +44,33 @@ if exist %filePath% (
 pause 
 
 exit
+--------------------------------------------------------------------------------------------
+
+@echo off
+:: List of IP addresses
+setlocal enabledelayedexpansion
+set "ipList=192.168.1.10 192.168.1.11 192.168.1.12"
+
+:: Path to PsExec executable
+set PsExecPath="C:\Path\to\psexec.exe"
+
+:: Command to delete the file
+set CommandToRun="del C:\Windows\System32\drivers\CrowdStrike\C-00000291-00000000-00000033.sys"
+
+:: Loop through each IP in the list
+for %%i in (%ipList%) do (
+    echo Running command on %%i
+    %PsExecPath% \\%%i -s cmd /c %CommandToRun%
+    
+    if !errorlevel! neq 0 (
+        echo Failed to execute on %%i
+    ) else (
+        echo Command executed successfully on %%i
+    )
+)
+
+pause
+
 
 --------------------------------------------------------------------------------------------
 
@@ -52,6 +79,62 @@ Also alternate:
 del C:\Windows\System32\drivers\CrowdStrike\C-00000291-00000000-00000033.sys
 
 --------------------------------------------------------------------------------------------
+
+# Get the path to the current script directory
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
+
+# Paths to the IP list and PsExec
+$ipListPath = Join-Path $scriptDir "ips.txt"
+$PsExecPath = Join-Path $scriptDir "PsExec.exe"
+
+# Command to delete the file on the remote system
+$CommandToRun = 'del C:\Windows\System32\drivers\CrowdStrike\C-00000291-00000000-00000033.sys'
+
+# Check if the IP list file exists
+if (-not (Test-Path -Path $ipListPath)) {
+    Write-Host "Error: IP list file 'ips.txt' not found in $scriptDir." -ForegroundColor Red
+    exit
+}
+
+# Check if PsExec executable exists
+if (-not (Test-Path -Path $PsExecPath)) {
+    Write-Host "Error: PsExec.exe not found in $scriptDir." -ForegroundColor Red
+    exit
+}
+
+# Read IPs from the file
+$ipList = Get-Content -Path $ipListPath
+
+if ($ipList.Count -eq 0) {
+    Write-Host "Error: 'ips.txt' is empty. Please provide IP addresses." -ForegroundColor Red
+    exit
+}
+
+Write-Host "Starting deletion process..." -ForegroundColor Green
+
+foreach ($ip in $ipList) {
+    Write-Host "Running command on $ip"
+    
+    # Run PsExec command on the remote machine
+    $process = Start-Process -FilePath $PsExecPath -ArgumentList "\\$ip -s cmd /c $CommandToRun" -Wait -NoNewWindow -PassThru
+
+    # Check if the command succeeded or failed
+    if ($process.ExitCode -eq 0) {
+        Write-Host "Command executed successfully on $ip" -ForegroundColor Green
+    } else {
+        Write-Host "Failed to execute on $ip" -ForegroundColor Red
+    }
+}
+
+Write-Host "Deletion process finished." -ForegroundColor Green
+
+# Pause to review the results
+Read-Host -Prompt "Press Enter to exit"
+
+--------------------------------------------------------------------------------------------
+
+
+
 \\Ongoing issues: 
 
 (VEEM catalog & inventory of tapes) server was distrupted by the outage due to CloudStrike. (Resolved)
