@@ -1,4 +1,4 @@
-    param (
+param (
     [string]$IPAddress,          # IP address of the remote computer (optional)
     [string]$NewHostname,        # New hostname for the remote computer (optional)
     [switch]$Reboot              # Optional parameter to reboot after renaming
@@ -44,4 +44,25 @@ if (-not $NewHostname) {
 }
 
 # Ensure both IP address and new hostname are provided
-if (-not $
+if (-not $IPAddress -or -not $NewHostname) {
+    Write-Host "Error: You must provide both the IP address and new hostname." -ForegroundColor Yellow
+    exit
+}
+
+# Call the rename function for the remote computer
+Rename-RemoteComputerName -IPAddress $IPAddress -New $NewHostname
+
+# Optionally reboot the remote computer if the -Reboot switch is used
+if ($Reboot) {
+    Write-Host "Rebooting the remote computer in 10 seconds..." -ForegroundColor Yellow
+    try {
+        Invoke-Command -ComputerName $IPAddress -ScriptBlock {
+            Start-Sleep -Seconds 10
+            Restart-Computer -Force
+        }
+    } catch {
+        Write-Host "Error rebooting the remote computer: $_" -ForegroundColor Red
+    }
+} else {
+    Write-Host "Rename complete. No reboot initiated." -ForegroundColor Cyan
+}
