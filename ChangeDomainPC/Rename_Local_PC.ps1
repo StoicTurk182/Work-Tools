@@ -1,6 +1,4 @@
-﻿# Define parameters
 param (
-    [string]$CurrentHostname,    # Current hostname of the computer
     [string]$NewHostname,        # New hostname for the computer
     [switch]$Reboot              # Optional parameter to reboot after renaming
 )
@@ -12,14 +10,6 @@ function Rename-ComputerName {
         [string]$New
     )
 
-    # Check if the current hostname matches the provided current hostname
-    $currentComputerName = (Get-ComputerInfo).CsName
-
-    if ($currentComputerName -ne $Current) {
-        Write-Host "Error: The provided current hostname does not match the actual hostname ($currentComputerName)." -ForegroundColor Red
-        return
-    }
-
     # Rename the computer
     try {
         Rename-Computer -NewName $New -Force
@@ -29,9 +19,20 @@ function Rename-ComputerName {
     }
 }
 
-# Main script execution
-if (-not $CurrentHostname -or -not $NewHostname) {
-    Write-Host "Please provide both the current hostname and the new hostname." -ForegroundColor Yellow
+# Fetch the current hostname automatically
+$CurrentHostname = (Get-ComputerInfo).CsName
+
+# Display the current hostname
+Write-Host "Current hostname: $CurrentHostname" -ForegroundColor Cyan
+
+# Prompt for the new hostname if not provided as a parameter
+if (-not $NewHostname) {
+    $NewHostname = Read-Host "Please enter the new hostname"
+}
+
+# Check if a new hostname was provided
+if (-not $NewHostname) {
+    Write-Host "Error: You must provide a new hostname." -ForegroundColor Yellow
     exit
 }
 
