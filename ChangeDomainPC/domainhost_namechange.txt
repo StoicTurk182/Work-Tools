@@ -1,0 +1,28 @@
+\\Notes 
+
+You must! allow for Powershell remoting: 
+Enable-PSRemoting -Forced
+
+You must check: 
+Get-Service -Name WinRM
+
+You must check that the service is runnign:
+Start-Service -Name WinRM
+
+
+Other things to check: change example IP to the IP or IP range you need of the target ssystems"
+
+Set-Item WSMan:\localhost\Client\TrustedHosts -Value "192.168.1.10"
+
+Set-Item WSMan:\localhost\Client\TrustedHosts -Value "192.168.1.*"
+
+Get-Item WSMan:\localhost\Client\TrustedHosts
+
+
+Further Authentication methods: 
+
+Invoke-Command -ComputerName $IPAddress -Credential (Get-Credential) -ScriptBlock $scriptBlock -ArgumentList $New
+
+Get-NetFirewallRule -Name "WINRM-HTTP-In-TCP-PUBLIC"
+
+Enable-NetFirewallRule -Name "WINRM-HTTP-In-TCP-PUBLIC"
