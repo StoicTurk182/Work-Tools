@@ -1,67 +1,69 @@
-﻿# Define parameters
 param (
-    [string]$RemoteComputer,      # Remote computer's current hostname or IP
-    [string]$NewHostname,         # New hostname for the remote computer
-    [switch]$Reboot,              # Optional parameter to reboot after renaming
-    [string]$CredentialUser,      # Username for credential (optional)
-    [string]$CredentialPass       # Password for credential (optional)
+    [string]$IPAddress,          # IP address of the remote computer
+    [string]$NewHostname,        # New hostname for the remote computer
+    [switch]$Reboot              # Optional parameter to reboot after renaming
 )
 
-# Convert credentials into PSCredential object if provided
-if ($CredentialUser -and $CredentialPass) {
-    $SecurePassword = ConvertTo-SecureString $CredentialPass -AsPlainText -Force
-    $Credential = New-Object System.Management.Automation.PSCredential ($CredentialUser, $SecurePassword)
-} else {
-    $Credential = $null
-}
-
-# Function to rename the computer
-function Rename-RemoteComputer {
+# Function to rename the remote computer
+function Rename-RemoteComputerName {
     param (
-        [string]$Remote,
-        [string]$New,
-        [PSCredential]$Cred
+        [string]$IPAddress,
+        [string]$New
     )
 
+    # Script block to run on the remote machine
+    $scriptBlock = {
+        param ($NewHostname)
+        $CurrentHostname = (Get-ComputerInfo).CsName
+        Write-Host "Current hostname on remote machine: $CurrentHostname" -ForegroundColor Cyan
+        
+        try {
+            Rename-Computer -NewName $NewHostname -Force
+            Write-Host "Hostname renamed to $NewHostname successfully." -ForegroundColor Green
+        } catch {
+            Write-Host "Error renaming hostname: $_" -ForegroundColor Red
+        }
+    }
+
+    # Run the script block on the remote machine
     try {
-        # Rename the remote computer
-        Rename-Computer -ComputerName $Remote -NewName $New -Force -Credential $Cred
-        Write-Host "Hostname on $Remote renamed to $New successfully." -ForegroundColor Green
+        Invoke-Command -ComputerName $IPAddress -ScriptBlock $scriptBlock -ArgumentList $New
     } catch {
-        Write-Host "Error renaming hostname on ${Remote}: $_" -ForegroundColor Red
+        Write-Host "Error connecting to remote machine: $_" -ForegroundColor Red
     }
 }
 
-# Function to reboot the computer
-function Reboot-RemoteComputer {
-    param (
-        [string]$Remote,
-        [PSCredential]$Cred
-    )
-
-    try {
-        # Reboot the remote computer
-        Restart-Computer -ComputerName $Remote -Force -Credential $Cred
-        Write-Host "${Remote} is being rebooted." -ForegroundColor Yellow
-    } catch {
-        Write-Host "Error rebooting ${Remote}: $_" -ForegroundColor Red
-    }
-}
-
-# Main script execution
-if (-not $RemoteComputer -or -not $NewHostname) {
-    Write-Host "Please provide both the remote computer's hostname/IP and the new hostname." -ForegroundColor Yellow
+# Validate IP address
+if (-not $IPAddress) {
+    Write-Host "Please provide the IP address of the remote computer." -ForegroundColor Yellow
     exit
 }
 
-# Call the rename function
-Rename-RemoteComputer -Remote $RemoteComputer -New $NewHostname -Cred $Credential
+# Prompt for the new hostname if not provided as a parameter
+if (-not $NewHostname) {
+    $NewHostname = Read-Host "Please enter the new hostname"
+}
+
+# Ensure a new hostname was provided
+if (-not $NewHostname) {
+    Write-Host "Error: You must provide a new hostname." -ForegroundColor Yellow
+    exit
+}
+
+# Call the rename function for the remote computer
+Rename-RemoteComputerName -IPAddress $IPAddress -New $NewHostname
 
 # Optionally reboot the remote computer if the -Reboot switch is used
 if ($Reboot) {
-    Write-Host "Rebooting the remote computer $RemoteComputer in 10 seconds..." -ForegroundColor Yellow
-    Start-Sleep -Seconds 10
-    Reboot-RemoteComputer -Remote $RemoteComputer -Cred $Credential
+    Write-Host "Rebooting the remote computer in 10 seconds..." -ForegroundColor Yellow
+    try {
+        Invoke-Command -ComputerName $IPAddress -ScriptBlock {
+            Start-Sleep -Seconds 10
+            Restart-Computer -Force
+        }
+    } catch {
+        Write-Host "Error rebooting the remote computer: $_" -ForegroundColor Red
+    }
 } else {
     Write-Host "Rename complete. No reboot initiated." -ForegroundColor Cyan
 }
