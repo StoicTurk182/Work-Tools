@@ -1,0 +1,20 @@
+#!/bin/bash
+CLIENT_NAME="$1"
+
+if [ -z "$CLIENT_NAME" ]; then
+    echo "Available clients:"
+    sudo ls /etc/wireguard/clients/*.conf 2>/dev/null | xargs -n 1 basename | sed 's/.conf$//'
+    echo ""
+    echo "Usage: wg-qr-simple client_name"
+    exit 1
+fi
+
+CLIENT_FILE="/etc/wireguard/clients/${CLIENT_NAME}.conf"
+
+if sudo test -f "$CLIENT_FILE"; then
+    echo "=== QR CODE FOR: $CLIENT_NAME ==="
+    sudo cat "$CLIENT_FILE" | qrencode -t ansiutf8
+else
+    echo "❌ Client '$CLIENT_NAME' not found!"
+    echo "Available: $(sudo ls /etc/wireguard/clients/*.conf 2>/dev/null | xargs -n 1 basename | sed 's/.conf$//' | tr '\n' ' ')"
+fi

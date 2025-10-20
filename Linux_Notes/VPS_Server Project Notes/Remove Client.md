@@ -1,0 +1,19 @@
+#!/bin/bash
+echo "=== REMOVE WIREGUARD CLIENT ==="
+read -p "Enter client name to remove: " CLIENT_NAME
+
+# Remove from server config
+sudo sed -i "/# $CLIENT_NAME/,+2d" /etc/wireguard/wg0.conf
+
+# Remove config file
+sudo rm -f /etc/wireguard/clients/${CLIENT_NAME}.conf
+
+# Restart WireGuard
+sudo wg-quick down wg0
+sudo wg-quick up wg0
+
+echo "✅ Client $CLIENT_NAME removed!"
+sudo wg show
+
+# sudo chmod +x /usr/local/bin/wg-remove-client
+

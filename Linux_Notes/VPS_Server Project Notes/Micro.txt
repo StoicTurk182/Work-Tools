@@ -1,0 +1,52 @@
+15:00 19 October 2025
+
+Micro Txt editor guide - debian 
+
+File Operations:
+Ctrl + S - Save file
+
+Ctrl + Q - Quit
+
+Ctrl + O - Open file
+
+Ctrl + Z - Undo
+
+Ctrl + Y - Redo
+
+Navigation:
+Arrow Keys - Move cursor
+
+Ctrl + A - Beginning of line
+
+Ctrl + E - End of line
+
+Ctrl + F - Find
+
+Ctrl + N - Find next
+
+Page Up/Down - Scroll
+
+Mouse Click - Position cursor anywhere
+
+Editing:
+Ctrl + K - Cut line
+
+Ctrl + U - Paste
+
+Ctrl + D - Delete character
+
+Ctrl + W - Delete word
+
+Tab - Indent
+
+Shift + Tab - Unindent
+
+
+
+SAVE CTRL O > Y
+
+Example -  
+
+chmod +x test-script.sh
+
+./test-script.sh

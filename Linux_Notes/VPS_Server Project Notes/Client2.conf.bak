@@ -1,0 +1,9 @@
+[Interface]
+PrivateKey = SNurvcJGEokUfB3HzGK41HLqbOxkEpMfmo3AxGmssHc=
+Address = 10.0.0.3/32
+DNS = 8.8.8.8, 8.8.4.4
+
+[Peer]
+PublicKey = dxgJEGfSB1wXdC9zFmR7s4WiFmV8kLzNAVM//F5K8Ak=
+Endpoint = 37.59.96.34:51820
+AllowedIPs = 10.0.0.0/24

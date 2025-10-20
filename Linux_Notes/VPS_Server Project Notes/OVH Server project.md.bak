@@ -1,0 +1,128 @@
+19:34 18 October 2025
+
+	  ssh debian@100.112.29.73
+	  
+	  ssh debian@100.112.29.73 -p 22022 -v (PAM+ED209)
+	  
+	  VPS server setup: 
+	  
+	  APT Packages setup 
+	  
+	  Fail2ban 
+	  PAM
+	  SSH Hardening to port 22022 
+	  SSH via Tailscale 
+	  (This can be used for remote support this also bypasses SSH key based authentication
+	  OVH FW & UFW FW 
+	  
+	  Introduction
+	  
+	   The server is going to be used as a secure test platform for projects ranging from: 3CX, Linux
+	   OS familiarization. 
+	   
+	   WAN IP address restrictions are in place this can also be bypassed via the use of Tailscale.
+
+	Topology
+	
+	Client PC  - Orion VI > OVH > server
+	
+	
+	
+# Check all services    - bash /tmp/service-report.sh
+
+sudo nano /tmp/service-report.sh
+
+/tmp/service-report.sh
+	
+	
+	
+	Wires Guard VPN included with full setup shown below: 
+
+# Generate keys
+CLIENT2_PRIVATE_KEY=$(wg genkey)
+CLIENT2_PUBLIC_KEY=$(echo "$CLIENT2_PRIVATE_KEY" | wg pubkey)
+
+echo "Private Key: $CLIENT2_PRIVATE_KEY"
+echo "Public Key: $CLIENT2_PUBLIC_KEY"
+
+# Save keys
+sudo mkdir -p /etc/wireguard/clients
+echo "$CLIENT2_PRIVATE_KEY" | sudo tee /etc/wireguard/clients/client2_privatekey
+echo "$CLIENT2_PUBLIC_KEY" | sudo tee /etc/wireguard/clients/client2_publickey
+sudo chmod 600 /etc/wireguard/clients/client2_privatekey
+sudo chmod 644 /etc/wireguard/clients/client2_publickey
+
+# Create config
+sudo tee /etc/wireguard/clients/client2.conf > /dev/null << EOF
+[Interface]
+PrivateKey = $CLIENT2_PRIVATE_KEY
+Address = 10.0.0.3/32
+DNS = 8.8.8.8, 8.8.4.4
+
+[Peer]
+PublicKey = 6LGaK3hX1/Y3zefxUdcddaeD/PuRK+F9jsE8P6/gZ3M=
+Endpoint = 37.59.96.34:51820
+AllowedIPs = 0.0.0.0/0
+EOF
+
+sudo chmod 600 /etc/wireguard/clients/client2.conf
+
+echo "Client 2 setup complete!"
+
+
+sudo tcpdump -i any -n udp port 51820
+
+
+#!/bin/bash
+echo "=== SYSTEM SERVICES REPORT ==="
+
+echo -e "\n1. ACTIVE SERVICES:"
+systemctl list-units --type=service --state=active --no-pager
+
+echo -e "\n2. FAILED SERVICES:"
+systemctl list-units --type=service --state=failed --no-pager
+
+echo -e "\n3. WIREGUARD STATUS:"
+sudo systemctl status wg-quick@wg0 --no-pager | head -10
+
+echo -e "\n4. SSH STATUS:"
+sudo systemctl status ssh --no-pager | head -5
+
+echo -e "\n5. FIREWALL STATUS:"
+sudo systemctl status ufw --no-pager | head -5
+
+echo -e "\n6. TOP MEMORY USING SERVICES:"
+ps aux --sort=-%mem | head -10
+
+
+chmod +x /tmp/service-report.sh
+/tmp/service-report.sh
+
+# Count running services
+systemctl list-units --type=service --state=running | wc -l
+
+# Show recently started services
+systemctl list-units --type=service --state=running --no-legend | head -10
+
+# Check if specific service is running
+sudo systemctl is-active wg-quick@wg0 && echo "WireGuard: ACTIVE" || echo "WireGuard: INACTIVE"
+
+
+
+Script list: 
+
+-rwxr-xr-x  1 root root  585 Oct 19 14:20 backup-simple.sh
+-rwxr-xr-x  1 root root 1575 Oct 19 13:31 wg-add-client
+-rwxr-xr-x  1 root root  172 Oct 19 13:32 wg-list-clients
+-rwxr-xr-x  1 root root  633 Oct 19 13:48 wg-qr
+-rwxr-xr-x  1 root root  386 Oct 19 13:32 wg-remove-client
+-rwxr-xr-x  1 root root 1146 Oct 19 12:40 wg-show-qr.sh
+
+
+/root/backup-system.sh
+/root/simple-registry.sh
+/root/script-registry-manager.sh
+/home/debian/test-script.sh
+/usr/local/bin/backup-simple.sh
+/usr/local/bin/wg-show-qr.sh
+root@vps-09f41b51:/home/debian#

@@ -1,0 +1,321 @@
+-----------------------Begin-14:05 19 October 2025
+
+
+ sudo nano /usr/local/bin/wg-show-qr.sh
+
+#!/bin/bash
+PHONE_IP="10.0.0.4"
+SERVER_PUBLIC_KEY="6LGaK3hX1/Y3zefxUdcddaeD/PuRK+F9jsE8P6/gZ3M="
+SERVER_IP="37.59.96.34"
+
+echo "=== CREATING PHONE CONFIG ==="
+
+# Generate keys
+PHONE_PRIVATE=$(wg genkey)
+PHONE_PUBLIC=$(echo "$PHONE_PRIVATE" | wg pubkey)
+
+echo "Phone Private Key: $PHONE_PRIVATE"
+echo "Phone Public Key: $PHONE_PUBLIC"
+
+# Create directory
+sudo mkdir -p /etc/wireguard/clients
+
+# Create phone config
+sudo tee /etc/wireguard/clients/phone.conf > /dev/null << EOF
+[Interface]
+PrivateKey = $PHONE_PRIVATE
+Address = $PHONE_IP/32
+DNS = 8.8.8.8, 8.8.4.4
+
+[Peer]
+PublicKey = $SERVER_PUBLIC_KEY
+Endpoint = $SERVER_IP:51820
+AllowedIPs = 10.0.0.0/24
+EOF
+
+sudo chmod 600 /etc/wireguard/clients/phone.conf
+
+# Add to server config
+sudo tee -a /etc/wireguard/wg0.conf > /dev/null << EOF
+
+[Peer]
+# Phone
+PublicKey = $PHONE_PUBLIC
+AllowedIPs = $PHONE_IP/32
+EOF
+
+# Restart WireGuard
+sudo wg-quick down wg0
+sudo wg-quick up wg0
+
+echo "=== PHONE CONFIG CREATED ==="
+echo "Config: /etc/wireguard/clients/phone.conf"
+echo "Phone IP: $PHONE_IP"
+
+# Generate QR code
+echo ""
+echo "=== QR CODE ==="
+qrencode -t ansiutf8 < /etc/wireguard/clients/phone.conf
+
+
+wg-show-qr.sh phone
+
+qrencode -t ansiutf8 < /etc/wireguard/clients/phone.conf
+
+----------------------- End - 14:21 19 October 2025
+
+
+----------------------- # Universal Script - 14:21 19 October 2025
+
+		#!/bin/bash
+SERVER_PUBLIC_KEY="6LGaK3hX1/Y3zefxUdcddaeD/PuRK+F9jsE8P6/gZ3M="
+SERVER_IP="37.59.96.34"
+
+echo "=== WIREGUARD CLIENT CREATOR WITH QR ==="
+read -p "Enter client name: " CLIENT_NAME
+read -p "Enter client IP (e.g., 10.0.0.X): " CLIENT_IP
+
+# Generate keys
+CLIENT_PRIVATE=$(wg genkey)
+CLIENT_PUBLIC=$(echo "$CLIENT_PRIVATE" | wg pubkey)
+
+echo "Client Private Key: $CLIENT_PRIVATE"
+echo "Client Public Key: $CLIENT_PUBLIC"
+
+# Create directory
+sudo mkdir -p /etc/wireguard/clients
+
+# Create client config
+sudo tee /etc/wireguard/clients/${CLIENT_NAME}.conf > /dev/null << EOF
+[Interface]
+PrivateKey = $CLIENT_PRIVATE
+Address = $CLIENT_IP/32
+DNS = 8.8.8.8, 8.8.4.4
+
+[Peer]
+PublicKey = $SERVER_PUBLIC_KEY
+Endpoint = $SERVER_IP:51820
+AllowedIPs = 10.0.0.0/24
+EOF
+
+sudo chmod 600 /etc/wireguard/clients/${CLIENT_NAME}.conf
+
+# Add to server config
+sudo tee -a /etc/wireguard/wg0.conf > /dev/null << EOF
+
+[Peer]
+# $CLIENT_NAME
+PublicKey = $CLIENT_PUBLIC
+AllowedIPs = $CLIENT_IP/32
+EOF
+
+# Restart WireGuard
+sudo wg-quick down wg0
+sudo wg-quick up wg0
+
+echo "=== CLIENT CREATED SUCCESSFULLY ==="
+echo "Config: /etc/wireguard/clients/${CLIENT_NAME}.conf"
+echo "Client IP: $CLIENT_IP"
+
+# Generate QR code
+echo ""
+echo "=== QR CODE ==="
+if command -v qrencode &> /dev/null; then
+    qrencode -t ansiutf8 < /etc/wireguard/clients/${CLIENT_NAME}.conf
+else
+    echo "Install qrencode for QR codes: sudo apt install qrencode"
+    echo ""
+    echo "=== CONFIG CONTENT ==="
+    sudo cat /etc/wireguard/clients/${CLIENT_NAME}.conf
+fi
+
+echo ""
+echo "=== WIREGUARD STATUS ==="
+sudo wg show
+
+-----------------------  
+		    # Run
+./phone-setup.sh
+
+./client-creator.sh
+# Enter: laptop, 10.0.0.5
+# Enter: tablet, 10.0.0.6
+
+
+
+
+ -------------------------13:43 19 October 2025
+# Create config AND generate QR in one command
+
+PHONE_PRIVATE=$(wg genkey) && PHONE_PUBLIC=$(echo "$PHONE_PRIVATE" | wg pubkey) && sudo mkdir -p /etc/wireguard/clients && sudo tee /etc/wireguard/clients/phone.conf > /dev/null << EOF && sudo tee -a /etc/wireguard/wg0.conf > /dev/null << EOF2 && sudo chmod 600 /etc/wireguard/clients/phone.conf && sudo wg-quick down wg0 && sudo wg-quick up wg0 && echo "=== PHONE CONFIG READY ===" && qrencode -t ansiutf8 < /etc/wireguard/clients/phone.conf
+[Interface]
+PrivateKey = $PHONE_PRIVATE
+Address = 10.0.0.4/32
+DNS = 8.8.8.8, 8.8.4.4
+
+[Peer]
+PublicKey = 6LGaK3hX1/Y3zefxUdcddaeD/PuRK+F9jsE8P6/gZ3M=
+Endpoint = 37.59.96.34:51820
+AllowedIPs = 10.0.0.0/24
+EOF
+[Peer]
+# Phone
+PublicKey = $PHONE_PUBLIC
+AllowedIPs = 10.0.0.4/32
+EOF2
+
+
+---------- Verification-14:05 19 October 2025
+
+
+sudo wg show
+sudo nano /etc/wireguard/wg0.conf
+
+Reset
+
+# Complete reset
+sudo wg-quick down wg0
+sudo systemctl stop wg-quick@wg0
+sudo systemctl start wg-quick@wg0
+sudo wg-quick up wg0
+sudo wg show
+
+			 PShell- Test-NetConnection -ComputerName 37.59.96.34 -Port 51820
+			 
+			 Test Established 
+			 
+			 sudo tcpdump -i any -n udp port 51820
+			 
+			 sudo cat /etc/wireguard/wg0.conf | grep ListenPort
+			 
+			 List scripts: 
+			 ls -la /usr/local/bin/wg-*
+			 
+			 
+			 
+			 Network Diagram: Test Methodology
+			 
+			 [Your Laptop at Coffee Shop]
+WAN IP: 202.1.2.3 | VPN IP: 10.8.0.3
+        |
+        | (Encrypted VPN Tunnel over Internet)
+        |
+[Your Home Router]
+Public IP: 123.456.789.123
+        |
+[Your VPN Server]
+Local IP: 192.168.1.10 | VPN IP: 10.8.0.1
+        |
+[Client 1 - Your RDP Target]
+Local IP: 192.168.1.20 | VPN IP: 10.8.0.2
+
+
+---------- Automate Clients: 
+
+# Generate new client
+CLIENT_PRIVATE=$(wg genkey)
+CLIENT_PUBLIC=$(echo "$CLIENT_PRIVATE" | wg pubkey)
+
+# Add to server
+echo -e "\n[Peer]\nPublicKey = $CLIENT_PUBLIC\nAllowedIPs = 10.0.0.X/32" | sudo tee -a /etc/wireguard/wg0.conf
+
+# Restart
+sudo wg-quick down wg0 && sudo wg-quick up wg0
+
+------------- New Keys
+
+# On your VPS, generate new client keys
+CLIENT_PRIVATE=$(wg genkey)
+CLIENT_PUBLIC=$(echo "$CLIENT_PRIVATE" | wg pubkey)
+echo "Private: $CLIENT_PRIVATE"
+echo "Public: $CLIENT_PUBLIC"
+
+
+------------ Add new Clients, append WG0
+
+# Generate new Client 2
+CLIENT2_PRIVATE=$(wg genkey)
+CLIENT2_PUBLIC=$(echo "$CLIENT2_PRIVATE" | wg pubkey)
+
+echo "Client 2 Private: $CLIENT2_PRIVATE"
+echo "Client 2 Public: $CLIENT2_PUBLIC"
+
+# Add to server config
+sudo tee -a /etc/wireguard/wg0.conf << EOF
+
+[Peer]
+# Client 2
+PublicKey = $CLIENT2_PUBLIC
+AllowedIPs = 10.0.0.3/32
+EOF
+
+
+
+Client mgmt script: 
+
+
+	#!/bin/bash
+SERVER_PUBLIC=$(sudo cat /etc/wireguard/publickey)
+SERVER_IP="37.59.96.34"
+
+case "$1" in
+    "add")
+        CLIENT_NAME=$2
+        CLIENT_IP=$3
+        
+        # Generate keys
+        CLIENT_PRIVATE=$(wg genkey)
+        CLIENT_PUBLIC=$(echo "$CLIENT_PRIVATE" | wg pubkey)
+        
+        # Add to server
+        echo -e "\n[Peer]\n# $CLIENT_NAME\nPublicKey = $CLIENT_PUBLIC\nAllowedIPs = $CLIENT_IP/32" | sudo tee -a /etc/wireguard/wg0.conf
+        
+        # Create client config
+        cat > $CLIENT_NAME.conf << EOF
+[Interface]
+PrivateKey = $CLIENT_PRIVATE
+Address = $CLIENT_IP/32
+DNS = 8.8.8.8, 8.8.4.4
+
+[Peer]
+PublicKey = $SERVER_PUBLIC
+Endpoint = $SERVER_IP:51820
+AllowedIPs = 0.0.0.0/0
+EOF
+        
+        # Restart WireGuard
+        sudo wg-quick down wg0 && sudo wg-quick up wg0
+        echo "✅ Client $CLIENT_NAME added!"
+        ;;
+        
+    "list")
+        sudo wg show
+        ;;
+        
+    "remove")
+        CLIENT_NAME=$2
+        sudo sed -i "/# $CLIENT_NAME/,+3d" /etc/wireguard/wg0.conf
+        sudo wg-quick down wg0 && sudo wg-quick up wg0
+        echo "✅ Client $CLIENT_NAME removed!"
+        ;;
+        
+    *)
+        echo "Usage: $0 {add|list|remove} [client_name] [client_ip]"
+        echo "Examples:"
+        echo "  $0 add phone 10.0.0.3"
+        echo "  $0 list"
+        echo "  $0 remove phone"
+        ;;
+esac
+
+		 sudo chmod +x /usr/local/bin/wg-manage.sh
+		 
+		 # usage
+		 
+		 wg-manage.sh add laptop 10.0.0.4
+		 
+		 List
+		 
+		 wg-manage.sh list
+		 
+			 # Find scripts

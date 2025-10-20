@@ -1,0 +1,62 @@
+11:59 20 October 2025
+Windows Network Sharing Binding for Backup implementation 
+
+sudo mkdir -p /mnt/VPS-BACKUP
+
+# Basic mount info   Check SMB - 
+
+mount
+df -h
+
+df -h -t cifs -t ext4 -t vfat
+findmnt
+
+mount | grep cifs
+df -h -t cifs
+
+mount | grep VPS-BACKUP
+df -h | grep VPS-BACKUP
+
+lsblk
+
+SMB Share Mount Setup for OVH VPS
+==================================
+
+1. INSTALL CIFS UTILS
+   sudo apt update && sudo apt install cifs-utils
+
+2. CREATE MOUNT POINT
+   sudo mkdir -p /mnt/VPS-BACKUP
+
+3. CREATE CREDENTIALS FILE
+   sudo nano /etc/samba/credentials
+   Add:
+   username=Administrator
+   password=YourWindowsPassword
+   sudo chmod 600 /etc/samba/credentials
+
+4. TEST MANUAL MOUNT
+   sudo mount -t cifs -o credentials=/etc/samba/credentials,uid=1000,gid=1000,vers=2.1,rw //10.0.0.2/vps-backup /mnt/VPS-BACKUP
+
+5. ADD TO FSTAB FOR PERSISTENCE
+   sudo nano /etc/fstab
+   Add line:
+   //10.0.0.2/vps-backup /mnt/VPS-BACKUP cifs credentials=/etc/samba/credentials,uid=1000,gid=1000,file_mode=0660,dir_mode=0770,_netdev,auto,nofail,rw,vers=2.1 0 0
+
+6. TEST FSTAB
+   sudo umount /mnt/VPS-BACKUP
+   sudo mount -a
+
+7. VERIFY MOUNT
+   df -h | grep VPS-BACKUP
+   ls -la /mnt/VPS-BACKUP/
+
+8. TEST WRITE PERMISSIONS
+   touch /mnt/VPS-BACKUP/test-file.txt
+
+NOTES:
+- Share will auto-mount on reboot
+- Uses SMB version 2.1 for compatibility
+- 'nofail' prevents boot hangs if Windows not available
+- Windows share must have Full Control permissions
+- VPS acts as VPN server, Windows client at 10.0.0.2
